@@ -1,25 +1,35 @@
 .top-container {
   position: fixed;
   top: 0;
-  z-index: 1;
+  z-index: 100;
   width: 100%;
   text-align: center;
   background-color: #075b0a;
-  color: #fff;
+  color: white;
+  padding: 10px 0;
 }
 
-.scroll-progress-tracking-container {
+.scroll-progress {
   width: 100%;
   height: 10px;
+  appearance: none;
+  border: none;
+  background-color: #aaf900;
+}
+
+.scroll-progress::-webkit-progress-bar {
   background: #aaf900;
 }
 
-.current-progress-bar {
-  height: 10px;
+.scroll-progress::-webkit-progress-value {
   background: #8b02b5;
-  width: 0%;
+}
+
+.scroll-progress::-moz-progress-bar {
+  background: #8b02b5;
 }
 
 .data-container {
   margin-top: 100px;
+  padding: 20px;
 }

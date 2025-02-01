@@ -7,76 +7,59 @@ export default function ScrollIndicator({ url }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [scrollPercentage, setScrollPercentage] = useState(0);
 
-  async function fetchData(getUrl) {
+  async function fetchData() {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await fetch(getUrl);
-      const data = await response.json();
-      if (data && data.products && data.products.length > 0) {
-        setData(data.products);
-        setLoading(false);
+      const response = await fetch(url);
+      const jsonData = await response.json();
+      if (jsonData?.products?.length) {
+        setData(jsonData.products);
       }
-    } catch (e) {
-      console.log(e);
-      setErrorMessage(e.message);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchData(url);
+    fetchData();
   }, [url]);
 
   function handleScrollPercentage() {
-    console.log(
-      document.body.scrollTop,
-      document.documentElement.scrollTop,
-      document.documentElement.scrollHeight,
-      document.documentElement.clientHeight
-    );
-
     const howMuchScrolled =
-      document.body.scrollTop || document.documentElement.scrollTop;
-
+      document.documentElement.scrollTop || document.body.scrollTop;
     const height =
       document.documentElement.scrollHeight -
       document.documentElement.clientHeight;
-
     setScrollPercentage((howMuchScrolled / height) * 100);
   }
 
   useEffect(() => {
     window.addEventListener("scroll", handleScrollPercentage);
-
-    return () => {
-      window.removeEventListener("scroll", () => {});
-    };
+    return () => window.removeEventListener("scroll", handleScrollPercentage);
   }, []);
 
-  console.log(data, scrollPercentage);
-
-  if (errorMessage) {
-    return <div>Error ! {errorMessage}</div>;
-  }
-
-  if (loading) {
-    return <div>Loading data ! Pleaae wait</div>;
-  }
+  if (errorMessage) return <div>Error: {errorMessage}</div>;
+  if (loading) return <div>Loading data... Please wait</div>;
 
   return (
     <div>
       <div className="top-container">
         <h1>Custom Scroll Indicator</h1>
-        <div className="scroll-progress-tracking-container">
-          <div
-            className="current-progress-bar"
-            style={{ width: `${scrollPercentage}%` }}
-          ></div>
-        </div>
+        <progress
+          className="scroll-progress"
+          value={scrollPercentage}
+          max="100"
+        ></progress>
       </div>
       <div className="data-container">
-        {data && data.length > 0
-          ? data.map((dataItem) => <p>{dataItem.title}</p>)
-          : null}
+        {data.length > 0 ? (
+          data.map((item) => <p key={item.id}>{item.title}</p>)
+        ) : (
+          <p>No data available.</p>
+        )}
       </div>
     </div>
   );
